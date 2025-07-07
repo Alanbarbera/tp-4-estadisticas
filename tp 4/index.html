@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Alumno</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      width: 400px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 25px;
+      color: #2c3e50;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
+      color: #34495e;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 6px;
+      border: 1px solid #ccd1d9;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    input[type="radio"] {
+      width: auto;
+      margin-right: 6px;
+    }
+
+    .radio-group {
+      margin-top: 8px;
+    }
+
+    .radio-group label {
+      display: inline-block;
+      margin-right: 15px;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .respuesta {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .link-ver {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .link-ver a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h1>Registro de Alumno</h1>
+  <form id="formAlumno">
+    <label>Nombre:
+      <input type="text" name="Nombre" required>
+    </label>
+
+    <label>Apellido:
+      <input type="text" name="Apellido" required>
+    </label>
+
+    <label>DNI:
+      <input type="number" name="DNI" placeholder="Sin puntos ni comas" required>
+    </label>
+
+    <label>Fecha de nacimiento:
+      <input type="date" name="Fecha_de_nacimiento" required>
+    </label>
+
+    <label>Sexo:
+      <select name="Sexo" required>
+        <option value="">Seleccionar</option>
+        <option value="M">Masculino</option>
+        <option value="F">Femenino</option>
+      </select>
+    </label>
+
+    <label>Edad:
+      <input type="number" name="Edad" min="1" max="120" required readonly>
+    </label>
+
+    <label>ID Curso:
+      <select name="ID_Curso" required>
+        <option value="">Seleccionar curso</option>
+        <option value="4">Sala 5A</option>
+        <option value="6">2do A</option>
+        <option value="3">6to B</option>
+        <option value="1">1ro A</option>
+        <option value="2">3do B</option>
+        <option value="5">1ro B</option>
+      </select>
+    </label>
+
+    <label>Nivel educativo:</label>
+    <div class="radio-group">
+      <label><input type="radio" value="3" name="ID_Nivel"> Nivel Inicial</label>
+      <label><input type="radio" value="1" name="ID_Nivel"> Nivel Primario</label>
+      <label><input type="radio" value="2" name="ID_Nivel"> Nivel Secundario</label>
+    </div>
+
+    <button type="submit">Registrar Alumno</button>
+  </form>
+
+  <div class="respuesta" id="respuesta"></div>
+
+  <div class="link-ver">
+    <a href="alumnos.html">Ver lista de alumnos registrados →</a>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('formAlumno');
+  const respuestaDiv = document.getElementById('respuesta');
+
+  form.Fecha_de_nacimiento.addEventListener('change', function () {
+    const fechaNacimiento = new Date(this.value);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    const m = hoy.getMonth() - fechaNacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+      edad--;
+    }
+    if (!isNaN(edad) && edad > 0) {
+      form.Edad.value = edad;
+    } else {
+      form.Edad.value = '';
+    }
+  });
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    respuestaDiv.style.color = 'black';
+    respuestaDiv.textContent = 'Registrando alumno...';
+
+    const formData = new FormData(this);
+    const datos = Object.fromEntries(formData.entries());
+
+    // Validaciones básicas
+    if (!datos.ID_Nivel) {
+      respuestaDiv.style.color = 'red';
+      respuestaDiv.textContent = 'Debe seleccionar un nivel educativo.';
+      return;
+    }
+
+    if (!/^\d{7,}$/.test(datos.DNI)) {
+      respuestaDiv.style.color = 'red';
+      respuestaDiv.textContent = 'El DNI debe tener al menos 7 dígitos.';
+      return;
+    }
+
+    // Guardar en LocalStorage
+    const alumnosPrevios = JSON.parse(localStorage.getItem('alumnosRegistrados')) || [];
+    alumnosPrevios.push(datos);
+    localStorage.setItem('alumnosRegistrados', JSON.stringify(alumnosPrevios));
+
+    respuestaDiv.style.color = 'green';
+    respuestaDiv.textContent = 'Alumno registrado correctamente.';
+    this.reset();
+  });
+</script>
+
+</body>
+</html>
